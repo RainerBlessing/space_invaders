@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,7 +25,7 @@ public class SpaceInvadersGame extends ApplicationAdapter {
 	private Missile playerMissile;
 
 	static final private String ASSET_DIRECTORY = "assets";
-	private List<InvaderCharacter> npcList = new LinkedList<>();
+	private final List<InvaderCharacter> npcList = new LinkedList<>();
 
 	private int invaderDirection = 1;
 	private boolean moveDown = false;
@@ -96,7 +95,7 @@ public class SpaceInvadersGame extends ApplicationAdapter {
 
 	private void processMovement() {
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			playerCharacter.moveLeft(viewport);
+			playerCharacter.moveLeft();
 		} else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 			playerCharacter.moveRight(viewport);
 		}
@@ -111,7 +110,7 @@ public class SpaceInvadersGame extends ApplicationAdapter {
 				if(npc.isActive())
 					npc.checkCollision(playerMissile);
 			}
-			if(npcList.stream().filter(npc -> npc.isActive()).count()==0){
+			if(npcList.stream().noneMatch(GameObject::isActive)){
 				 gameWon = true;
 			}
 		}
@@ -143,17 +142,15 @@ public class SpaceInvadersGame extends ApplicationAdapter {
 				}
 			}
 		}else{
-			Iterator<InvaderCharacter> npcIterator = npcList.iterator();
-			while(npcIterator.hasNext()){
-				NonPlayerCharacter npc = npcIterator.next();
-				if(npc.isActive()){
-					if(!npc.move(viewport)){
-						invaderDirection = 1;
-						moveDown= true;
-						break;
-					}
-				}
-			}
+            for (NonPlayerCharacter npc : npcList) {
+                if (npc.isActive()) {
+                    if (!npc.move(viewport)) {
+                        invaderDirection = 1;
+                        moveDown = true;
+                        break;
+                    }
+                }
+            }
 		}
 	}
 

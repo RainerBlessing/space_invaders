@@ -1,11 +1,9 @@
 package de.spaceinvaders;
 
-import com.badlogic.gdx.utils.viewport.Viewport;
-
-abstract public class GameObject extends StaticObject {
+public abstract class GameObject extends StaticObject {
    protected static final int MOVE_STEPS=8;
    boolean active = true;
-    public GameObject(String imagePath, int x, int y, int width, int height){
+    protected GameObject(String imagePath, int x, int y, int width, int height){
         super(imagePath, x, y, width, height);
         reset();
     }

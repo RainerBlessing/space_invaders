@@ -17,7 +17,7 @@ public class PlayerCharacter extends GameObject {
         return couldMove;
     }
 
-    public boolean moveLeft(Viewport viewport) {
+    public boolean moveLeft() {
         boolean couldMove=true;
 
         if((sprite.getX()-MOVE_STEPS)>0)
