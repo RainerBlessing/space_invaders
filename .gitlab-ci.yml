@@ -11,3 +11,7 @@ sonarqube-check:
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == 'main'
+build:
+  stage: build
+  script:
+    - ./gradlew build
