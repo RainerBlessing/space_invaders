@@ -9,6 +9,7 @@ cache:
     - .gradle/
 
 sonarqube-check:
+  stage: test
 #  image: gradle:jre14-slim
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache

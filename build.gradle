@@ -43,16 +43,6 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
     }
-
-    sonar {
-        properties {
-            property("sonar.projectKey", "space_invaders")
-            property("sonar.projectName", "space_invaders")
-            property("sonar.qualitygate.wait", true)
-            property("sonar.host.url", "http://sonarqube:9000")
-            property("sonar.token", "sqa_008d2ae42b0112ebc89bb81c824aafbfe1a094e6")
-        }
-    }
 }
 
 project(":desktop") {
@@ -103,5 +93,15 @@ project(":core") {
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "space_invaders")
+        property("sonar.projectName", "space_invaders")
+        property("sonar.qualitygate.wait", true)
+        property("sonar.host.url", "http://sonarqube:9000")
+        property("sonar.token", "sqa_008d2ae42b0112ebc89bb81c824aafbfe1a094e6")
     }
 }
