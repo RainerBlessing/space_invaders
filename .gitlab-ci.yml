@@ -1,3 +1,5 @@
+image: openjdk:14-jdk
+
 sonarqube-check:
   image: gradle:jre14-slim
   variables:
