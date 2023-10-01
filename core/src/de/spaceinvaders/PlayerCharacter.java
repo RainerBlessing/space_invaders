@@ -1,18 +1,29 @@
 package de.spaceinvaders;
 
+import com.badlogic.gdx.utils.viewport.Viewport;
+
 public class PlayerCharacter extends GameObject {
     public PlayerCharacter(String imagePath, int x, int y, int width, int height) {
         super(imagePath, x, y, width, height);
     }
 
-    final private int SPEED = 10;
+    public boolean moveRight(Viewport viewport) {
+        boolean couldMove=true;
 
-    public void move(int direction) {
-        if(direction>0){
-            y -= direction * SPEED;
-        }else if(direction<0){
-            y += direction * SPEED;
-        }
+        if((sprite.getX()+sprite.getWidth()+MOVE_STEPS)<viewport.getWorldWidth())
+            translateX(MOVE_STEPS);
+        else couldMove = false;
 
+        return couldMove;
+    }
+
+    public boolean moveLeft() {
+        boolean couldMove=true;
+
+        if((sprite.getX()-MOVE_STEPS)>0)
+            translateX(-MOVE_STEPS);
+        else couldMove = false;
+
+        return couldMove;
     }
 }

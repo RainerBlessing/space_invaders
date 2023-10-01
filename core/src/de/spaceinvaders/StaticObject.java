@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 public class StaticObject {
     protected final Texture img;
     protected final int x;
-    protected int y;
+    protected final int y;
     protected final int width;
     protected final int height;
     protected final Sprite sprite;
