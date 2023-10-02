@@ -2,12 +2,13 @@ package de.spaceinvaders;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-abstract public class NonPlayerCharacter extends PlayerCharacter{
+public abstract class NonPlayerCharacter extends PlayerCharacter{
 
-    public NonPlayerCharacter(String imagePath, Viewport viewport, int x, int y, int width, int height) {
+    protected NonPlayerCharacter(String imagePath, Viewport viewport, int x, int y, int width, int height) {
         super(imagePath, viewport, x, y, width, height);
     }
 
+    @Override
     protected void collision() {
         setActive(false);
         this.reset();

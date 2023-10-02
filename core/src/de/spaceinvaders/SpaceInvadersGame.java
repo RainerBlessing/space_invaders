@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.*;
 
 public class SpaceInvadersGame extends ApplicationAdapter {
+    private final Random randomNum = new Random();
     private SpriteBatch batch;
     private boolean gameLost;
     private boolean gameWon;
@@ -23,14 +24,14 @@ public class SpaceInvadersGame extends ApplicationAdapter {
     private Missile playerMissile;
     private Bomb bomb;
 
-    static final private String ASSET_DIRECTORY = "assets";
+    private static final String ASSET_DIRECTORY = "assets";
     private final List<InvaderCharacter> npcList = new LinkedList<>();
 
     private int invaderDirection = 1;
     private boolean moveDown = false;
 
-    private final static int invaderColumns = 8;
-    private final static int invaderRows = 5;
+    private static final int INVADER_COLUMNS = 8;
+    private static final int INVADER_ROWS = 5;
 
     @Override
     public void create() {
@@ -39,8 +40,8 @@ public class SpaceInvadersGame extends ApplicationAdapter {
 
         bomb = new Bomb(ASSET_DIRECTORY + "/bomb.png", viewport, 16, 16);
 
-        for (int i = 0; i < invaderRows; i++) {
-            for (int j = 0; j < invaderColumns; j++) {
+        for (int i = 0; i < INVADER_ROWS; i++) {
+            for (int j = 0; j < INVADER_COLUMNS; j++) {
                 npcList.add(new InvaderCharacter(ASSET_DIRECTORY + "/invader.png", viewport, j * 24 + 8, 160 - (i * 16), 16, 16));
             }
         }
@@ -64,50 +65,73 @@ public class SpaceInvadersGame extends ApplicationAdapter {
 
     private void dropBomb() {
 
-        List<InvaderCharacter> invaderCharactersAbleToDropBomb = new ArrayList<>();
-        for (int row = invaderRows-1; row >= 0; row--) {
-            for (int column = invaderColumns-1; column >= 0; column--) {
-                int currentIndex = (row * invaderColumns) + column;
-                InvaderCharacter invaderCharacter = npcList.get(currentIndex);
-                if(invaderCharacter.isActive() ){
-                    if (currentIndex + invaderColumns >= npcList.size()) {
-                        invaderCharactersAbleToDropBomb.add(invaderCharacter);
-                    }else{
-                        int lineOfSightIndex=currentIndex+invaderColumns;
-                        while(lineOfSightIndex<npcList.size()){
-                            InvaderCharacter currentInvader = npcList.get(lineOfSightIndex);
-                            if(currentInvader.isActive()){
-                               break;
-                            }
-                            lineOfSightIndex = lineOfSightIndex+invaderColumns;
-                        }
-                        if(lineOfSightIndex>npcList.size()){
-                            invaderCharactersAbleToDropBomb.add(invaderCharacter);
-                        }
-                    }
-                }
-            }
-        }
+        List<InvaderCharacter> invaderCharactersAbleToDropBomb = determineWhichInvadersCanDropBomb();
 
         if (!invaderCharactersAbleToDropBomb.isEmpty()) {
-            InvaderCharacter invaderCharacter;
-            Random randomNum = new Random();
-            if (invaderCharactersAbleToDropBomb.size() - 1 > 0) {
-                int index = randomNum.nextInt(invaderCharactersAbleToDropBomb.size() );
-                invaderCharacter = invaderCharactersAbleToDropBomb.get(index);
-            } else {
-                invaderCharacter = invaderCharactersAbleToDropBomb.get(0);
-            }
+            InvaderCharacter invaderCharacter = decideWhichInvaderShouldDropBomb(invaderCharactersAbleToDropBomb);
 
             bomb.setPosition(invaderCharacter.getSprite().getX(), invaderCharacter.getSprite().getY());
             bomb.setActive(true);
         }
     }
 
+    private List<InvaderCharacter> determineWhichInvadersCanDropBomb() {
+        List<InvaderCharacter> invaderCharactersAbleToDropBomb = new ArrayList<>();
+        for (int row = INVADER_ROWS - 1; row >= 0; row--) {
+            for (int column = INVADER_COLUMNS - 1; column >= 0; column--) {
+                determineIfInvaderCanDropBomb(row, column, invaderCharactersAbleToDropBomb);
+            }
+        }
+        return invaderCharactersAbleToDropBomb;
+    }
+
+    private void determineIfInvaderCanDropBomb(int row, int column, List<InvaderCharacter> invaderCharactersAbleToDropBomb) {
+        int currentIndex = (row * INVADER_COLUMNS) + column;
+        InvaderCharacter invaderCharacter = npcList.get(currentIndex);
+
+        if (invaderCharacter.isActive()) {
+            //In the last row anyone can drop bomb
+            if (currentIndex + INVADER_COLUMNS >= npcList.size()) {
+                invaderCharactersAbleToDropBomb.add(invaderCharacter);
+            } else {
+                if(freeLineOfSight(currentIndex))
+                    invaderCharactersAbleToDropBomb.add(invaderCharacter);
+            }
+        }
+    }
+
+    /**
+     *Can bomb be dropped without hitting other invader?
+     */
+    private boolean freeLineOfSight(int currentIndex) {
+
+        int lineOfSightIndex = currentIndex + INVADER_COLUMNS;
+        while (lineOfSightIndex < npcList.size()) {
+            InvaderCharacter currentInvader = npcList.get(lineOfSightIndex);
+            if (currentInvader.isActive()) {
+                break;
+            }
+            lineOfSightIndex = lineOfSightIndex + INVADER_COLUMNS;
+        }
+
+        return lineOfSightIndex > npcList.size();
+    }
+
+    private InvaderCharacter decideWhichInvaderShouldDropBomb(List<InvaderCharacter> invaderCharactersAbleToDropBomb) {
+        InvaderCharacter invaderCharacter;
+        if (invaderCharactersAbleToDropBomb.size() - 1 > 0) {
+            int index = randomNum.nextInt(invaderCharactersAbleToDropBomb.size());
+            invaderCharacter = invaderCharactersAbleToDropBomb.get(index);
+        } else {
+            invaderCharacter = invaderCharactersAbleToDropBomb.get(0);
+        }
+        return invaderCharacter;
+    }
+
     @Override
     public void render() {
         if (!gameWon && !gameLost) {
-            processMovement();
+            processActions();
         } else {
             if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
                 gameWon = false;
@@ -146,13 +170,74 @@ public class SpaceInvadersGame extends ApplicationAdapter {
         batch.end();
     }
 
-    private void processMovement() {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            playerCharacter.moveLeft();
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            playerCharacter.moveRight();
+    private void processActions() {
+        playerActions();
+
+        missileActions();
+
+        bombActions();
+
+        invaderActions();
+    }
+
+    private void invaderActions() {
+        moveDownInvaders();
+
+        moveDown = false;
+
+        moveInvaders();
+    }
+
+    private void moveInvaders() {
+        if (invaderDirection > 0) {
+            ListIterator<InvaderCharacter> npcIterator = npcList.listIterator(npcList.size());
+            while (npcIterator.hasPrevious()) {
+                NonPlayerCharacter npc = npcIterator.previous();
+                if (npc.isActive() && !npc.move()) {
+                    invaderDirection = -1;
+                    moveDown = true;
+                    break;
+                }
+            }
+        } else {
+            for (NonPlayerCharacter npc : npcList) {
+                if (npc.isActive() && !npc.move()) {
+                    invaderDirection = 1;
+                    moveDown = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void moveDownInvaders() {
+        for (InvaderCharacter npc : npcList) {
+            npc.setDirection(invaderDirection);
+            if (npc.isActive() && npc.getSprite().getY() < playerCharacter.sprite.getY() + (playerCharacter.sprite.getHeight())) {
+                gameLost = true;
+            } else if (moveDown) {
+                npc.moveDown();
+            }
+        }
+    }
+
+    private void bombActions() {
+        if (!bomb.isActive()) {
+            dropBomb();
         }
 
+        if (bomb.isActive()) {
+            playerCharacter.checkCollision(bomb, bomb.getBoundingRectangle());
+
+            if (playerCharacter.getLives() == 0) {
+                gameLost = true;
+            } else {
+                bomb.move();
+            }
+        }
+    }
+
+    private void missileActions() {
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && !playerMissile.isActive()) {
             playerMissile.sprite.setX(playerCharacter.sprite.getX());
             playerMissile.setActive(true);
@@ -171,53 +256,13 @@ public class SpaceInvadersGame extends ApplicationAdapter {
         if (playerMissile.isActive()) {
             playerMissile.move();
         }
+    }
 
-        if (!bomb.isActive()) {
-            dropBomb();
-//            bomb.isActive();
-        }
-
-        if (bomb.isActive()) {
-            playerCharacter.checkCollision(bomb,bomb.getBoundingRectangle());
-
-            if(playerCharacter.getLives()==0){
-                gameLost=true;
-            }else{
-                bomb.move();
-            }
-        }
-
-        for (InvaderCharacter npc : npcList) {
-            npc.setDirection(invaderDirection);
-            if (npc.isActive() && npc.getSprite().getY() < playerCharacter.sprite.getY() + (playerCharacter.sprite.getHeight())) {
-                gameLost = true;
-            } else if (moveDown) {
-                npc.moveDown();
-            }
-        }
-        moveDown = false;
-        if (invaderDirection > 0) {
-            ListIterator<InvaderCharacter> npcIterator = npcList.listIterator(npcList.size());
-            while (npcIterator.hasPrevious()) {
-                NonPlayerCharacter npc = npcIterator.previous();
-                if (npc.isActive()) {
-                    if (!npc.move()) {
-                        invaderDirection = -1;
-                        moveDown = true;
-                        break;
-                    }
-                }
-            }
-        } else {
-            for (NonPlayerCharacter npc : npcList) {
-                if (npc.isActive()) {
-                    if (!npc.move()) {
-                        invaderDirection = 1;
-                        moveDown = true;
-                        break;
-                    }
-                }
-            }
+    private void playerActions() {
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            playerCharacter.moveLeft();
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            playerCharacter.moveRight();
         }
     }
 

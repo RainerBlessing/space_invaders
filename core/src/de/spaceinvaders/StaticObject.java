@@ -2,7 +2,7 @@ package de.spaceinvaders;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-abstract public class StaticObject {
+public abstract class StaticObject {
     protected final int x;
     protected final int y;
     protected final Sprite sprite;
@@ -10,7 +10,7 @@ abstract public class StaticObject {
     private final SpriteCreator spriteCreator = new SpriteCreator();
     private final String textureID;
 
-    public StaticObject(String imagePath, int x, int y, int width, int height){
+    protected StaticObject(String imagePath, int x, int y, int width, int height){
         this.x = x;
         this.y = y;
 

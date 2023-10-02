@@ -25,12 +25,12 @@ public class Bomb extends NonPlayerCharacter{
 
         return couldMove;
     }
-
     public void setPosition(float x, float y) {
         sprite.setX(x);
         sprite.setY(y-4);//underneath invader
     }
 
+    @Override
     protected void collision() {
         setActive(false);
     }

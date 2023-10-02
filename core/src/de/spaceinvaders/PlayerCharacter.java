@@ -9,7 +9,7 @@ public class PlayerCharacter extends GameObject {
         super(imagePath, x, y, width, height);
         this.viewport = viewport;
     }
-
+    @Override
     public void reset() {
         super.reset();
         this.lives = 3;
@@ -24,6 +24,7 @@ public class PlayerCharacter extends GameObject {
             translateX(-MOVE_STEPS);
     }
 
+    @Override
     protected void collision() {
         lives = lives -1;
     }
