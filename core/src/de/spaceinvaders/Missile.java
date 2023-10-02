@@ -4,11 +4,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Missile extends NonPlayerCharacter {
     protected static final int MOVE =4;
-    public Missile(String imagePath, int x, int y, int width, int height) {
-        super(imagePath, x, y, width, height);
+
+    public Missile(String imagePath, Viewport viewport, int width, int height) {
+        super(imagePath, viewport, 0, 0, width, height);
     }
 
-    public boolean move(Viewport viewport) {
+    public boolean move() {
         boolean couldMove;
 
         if (sprite.getY() + sprite.getHeight() < viewport.getWorldHeight()) {

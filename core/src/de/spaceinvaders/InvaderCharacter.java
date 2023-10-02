@@ -6,11 +6,11 @@ public class InvaderCharacter  extends NonPlayerCharacter{
     public static final int SPEED = 1;
     private int moveX = SPEED;
 
-    public InvaderCharacter(String imagePath, int x, int y, int width, int height) {
-        super(imagePath, x, y, width, height);
+    public InvaderCharacter(String imagePath, Viewport viewport, int x, int y, int width, int height) {
+        super(imagePath, viewport, x, y, width, height);
     }
 
-    public boolean move(Viewport viewport) {
+    public boolean move() {
         boolean couldMove;
         if(moveX>0){
            if(sprite.getX()+sprite.getWidth()<viewport.getWorldWidth()) {

@@ -4,8 +4,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 abstract public class NonPlayerCharacter extends PlayerCharacter{
 
-    public NonPlayerCharacter(String imagePath, int x, int y, int width, int height) {
-        super(imagePath, x, y, width, height);
+    public NonPlayerCharacter(String imagePath, Viewport viewport, int x, int y, int width, int height) {
+        super(imagePath, viewport, x, y, width, height);
     }
 
     protected void collision() {
@@ -13,5 +13,5 @@ abstract public class NonPlayerCharacter extends PlayerCharacter{
         this.reset();
     }
 
-    public abstract boolean move(Viewport viewport);
+    public abstract boolean move();
 }
