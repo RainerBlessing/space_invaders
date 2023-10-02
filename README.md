@@ -12,8 +12,8 @@
 * Player can shoot
 * Enemies can be hit
 * Game over events
-# Todo
 * Enemies shooting
+# Todo
 * Speed increase
 * Big UFO
 * Bunkers
